@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ôn Thi GPLX Hạng B 2026</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#2563eb', secondary: '#10b981' }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS for Animations & Refinements -->
+    <style>
+        body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Hiệu ứng nhấp nháy cho câu điểm liệt */
+        @keyframes pulseCritical { 
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); background-color: #fee2e2; } 
+            50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); background-color: #fecaca; } 
+        }
+        .pulse-critical { animation: pulseCritical 1.5s infinite; }
+
+        /* Nút lựa chọn đáp án */
+        .btn-option { transition: all 0.2s; position: relative; overflow: hidden; }
+        .btn-option:active:not(:disabled) { transform: scale(0.98); }
+        .btn-option.correct { background-color: #f0fdf4; border-color: #22c55e; color: #166534; }
+        .btn-option.wrong { background-color: #fef2f2; border-color: #ef4444; color: #991b1b; }
+        .btn-option.selected { background-color: #eff6ff; border-color: #3b82f6; color: #1e3a8a; }
+        
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(241, 245, 249, 1); }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="glass-header sticky top-0 z-40 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-car"></i>
+                </div>
+                <h1 class="text-xl font-bold text-blue-700 hidden sm:block">GPLX B 2026</h1>
+            </div>
+
+            <!-- Auth Section -->
+            <div id="auth-section">
+                <button id="login-btn" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl font-medium shadow-sm transition-all flex items-center gap-2">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                    <span>Đăng nhập</span>
+                </button>
+                <div id="user-profile" class="hide flex items-center gap-3 bg-white border border-slate-100 p-1 pr-4 rounded-full shadow-sm">
+                    <img id="user-avatar" src="https://placehold.co/100" class="w-9 h-9 rounded-full border border-slate-200" alt="Avatar">
+                    <span id="user-name" class="font-semibold text-sm max-w-[100px] truncate text-slate-700"></span>
+                    <button id="logout-btn" class="ml-2 text-slate-400 hover:text-red-500 transition-colors" title="Đăng xuất">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-6 relative">
+
+        <!-- 1. Landing View -->
+        <div id="view-landing" class="flex flex-col items-center justify-center text-center mt-20 fade-in">
+            <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <i class="fa-solid fa-graduation-cap text-5xl text-blue-600"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">Hệ Thống Ôn Thi GPLX B</h2>
+            <p class="text-slate-500 max-w-md text-lg mb-8">Nền tảng học và thi thử lý thuyết lái xe hiện đại. Hãy đăng nhập để lưu trữ tiến độ học tập trên Cloud.</p>
+        </div>
+
+        <!-- 2. Dashboard View -->
+        <div id="view-dashboard" class="hide slide-up space-y-8 pb-12">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Chọn chế độ học</h2>
+                <p class="text-slate-500 mt-1">Dữ liệu được đồng bộ hóa với tài khoản của bạn.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                
+                <!-- Thi Thử -->
+                <div onclick="startMode('exam')" class="group cursor-pointer bg-gradient-to-br from-indigo-600 to-blue-600 rounded-3xl p-6 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 sm:col-span-2 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 opacity-10 text-9xl transform translate-x-4 -translate-y-4">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <div class="relative z-10 flex flex-col h-full justify-between">
+                        <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl backdrop-blur-sm mb-4">
+                            <i class="fa-solid fa-flag-checkered"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-1">Thi thử chuẩn Bộ GTVT</h3>
+                            <p class="text-blue-100 font-medium text-sm">30 câu ngẫu nhiên • 20 phút • Sai >3 câu hoặc sai điểm liệt = Trượt</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Học theo đề -->
+                <div onclick="startMode('random')" class="cursor-pointer bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:border-blue-300 hover:shadow-md transition-all duration-300">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Học theo đề ngẫu nhiên</h3>
+                    <p class="text-slate-500 text-sm mt-1">Luyện tập không áp lực thời gian.</p>
+                </div>
+
+                <!-- Học theo chương -->
+                <div onclick="startMode('chapter')" class="cursor-pointer bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:border-emerald-300 hover:shadow-md transition-all duration-300">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-book"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Học theo chương</h3>
+                    <p class="text-slate-500 text-sm mt-1">Ôn luyện 600 câu theo chủ đề.</p>
+                </div>
+
+                <!-- Học câu sai -->
+                <div onclick="startMode('wrong')" class="cursor-pointer bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:border-orange-300 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <span id="badge-wrong" class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Ôn lại câu sai</h3>
+                        <p class="text-slate-500 text-sm mt-1">Khắc phục điểm yếu.</p>
+                    </div>
+                </div>
+
+                <!-- Câu lưu ý -->
+                <div onclick="startMode('bookmark')" class="cursor-pointer bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:border-yellow-300 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-2xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span id="badge-bookmark" class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Câu đã đánh dấu</h3>
+                        <p class="text-slate-500 text-sm mt-1">Các câu cần đặc biệt lưu ý.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. Quiz Interface -->
+        <div id="view-quiz" class="hide flex flex-col slide-up bg-white rounded-3xl shadow-lg border border-slate-100 p-5 sm:p-8 min-h-[70vh]">
+            
+            <!-- Header: Progress & Timer -->
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                <div class="flex-1">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tiến độ <span id="quiz-mode-label" class="normal-case ml-2 text-blue-500"></span></div>
+                    <div class="flex items-center gap-3">
+                        <span id="quiz-progress-text" class="text-lg font-bold text-slate-800">1/30</span>
+                        <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden hidden sm:block max-w-[250px]">
+                            <div id="quiz-progress-bar" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="quiz-timer-container" class="hide bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm font-mono text-xl font-bold">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="quiz-timer">20:00</span>
+                </div>
+            </div>
+
+            <!-- Question Content -->
+            <div class="flex-1 flex flex-col mb-8">
+                <!-- Fatal Warning -->
+                <div id="quiz-critical-badge" class="hide pulse-critical text-red-700 px-4 py-1.5 rounded-full text-xs font-bold w-max mb-5 flex items-center gap-2 border border-red-200 shadow-sm">
+                    <i class="fa-solid fa-triangle-exclamation"></i> CÂU ĐIỂM LIỆT
+                </div>
+
+                <h3 id="quiz-question" class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug mb-6"></h3>
+
+                <!-- Options -->
+                <div id="quiz-options" class="space-y-3"></div>
+
+                <!-- Hint Box -->
+                <div id="quiz-hint" class="hide mt-6 bg-blue-50/50 rounded-2xl p-5 border border-blue-100 fade-in">
+                    <h4 class="font-bold text-blue-800 flex items-center gap-2 mb-2"><i class="fa-solid fa-lightbulb text-yellow-500"></i> Gợi ý giải đáp:</h4>
+                    <p id="quiz-hint-text" class="text-blue-900 text-sm leading-relaxed"></p>
+                </div>
+            </div>
+
+            <!-- Navigation Footer -->
+            <div class="pt-5 border-t border-slate-100 flex items-center gap-3 sm:gap-4">
+                <button id="btn-prev" onclick="navQuestion(-1)" class="w-12 h-12 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                
+                <button id="btn-bookmark" onclick="toggleBookmark()" class="flex-1 sm:flex-none sm:w-auto sm:px-6 h-12 flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition">
+                    <i id="icon-bookmark" class="fa-regular fa-star text-slate-400"></i> <span class="hidden sm:inline">Lưu ý câu này</span>
+                </button>
+
+                <button id="btn-next" onclick="navQuestion(1)" class="flex-1 h-12 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <span id="text-next">Câu tiếp</span> <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+                <button id="btn-submit" onclick="submitExam()" class="hide flex-1 h-12 items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition">
+                    <i class="fa-solid fa-paper-plane"></i> Nộp Bài
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal System -->
+    <div id="modal-overlay" class="hide fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in"></div>
+
+    <!-- Application Scripts -->
+
+    <!-- Dán config của bạn vào đây trước khi load code chính -->
+    <script>
+         const __firebase_config = JSON.stringify({
+            apiKey: "AIzaSyDwYXnjHJpV4Q0NfEJAqhYIUvN-aqwyxB4",
+            authDomain: "gplx2026-665a0.firebaseapp.com",
+            projectId: "gplx2026-665a0",
+            storageBucket: "gplx2026-665a0.firebasestorage.app",
+            messagingSenderId: "67944833469",
+            appId: "1:67944833469:web:373478f0c1dcc0e3aa72d4",
+            measurementId: "G-2NRQFD1MX8"
+        });
+    </script>
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+        // ==========================================
+        // 1. CONFIG & GLOBALS
+        // ==========================================
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'gplx-b-app';
+        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        let app, db, auth;
+        let isMockMode = false;
+
+        if (firebaseConfigStr === '{}') {
+            isMockMode = true;
+            console.warn("Chạy chế độ Offline (Thiếu Firebase Config)");
+            auth = { onAuthStateChanged: (cb) => { setTimeout(() => cb({uid:'mock-user', displayName:'Khách', photoURL:''}), 500); } };
+        } else {
+            const config = JSON.parse(firebaseConfigStr);
+            app = initializeApp(config);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        }
+
+        // ==========================================
+        // 2. DATA (Tạo file JSON giả lập)
+        // ==========================================
+        let questionBank = [];
+        
+        const generateMockJsonData = () => {
+            const mockData = [
+                { id: 1, chapter: 1, isFatal: false, question: "Khái niệm 'đường bộ' được hiểu như thế nào là đúng?", options: ["Đường, cầu đường bộ.", "Hầm đường bộ, bến phà đường bộ.", "Đường, cầu đường bộ, hầm đường bộ, bến phà đường bộ và các công trình phụ trợ."], correctAnswer: 2, hint: "Đường bộ bao gồm đầy đủ đường, cầu, hầm và bến phà đường bộ." },
+                { id: 2, chapter: 2, isFatal: true, question: "Hành vi giao xe cơ giới, xe máy chuyên dùng cho người không đủ điều kiện để điều khiển xe tham gia giao thông có được phép hay không?", options: ["Chỉ được phép nếu có người nhà ngồi cùng.", "Không được phép.", "Được phép tùy từng trường hợp."], correctAnswer: 1, hint: "Tuyệt đối không được phép giao xe cho người không đủ điều kiện theo quy định của pháp luật." },
+                { id: 3, chapter: 3, isFatal: true, question: "Cuộc đua xe chỉ được thực hiện khi nào?", options: ["Diễn ra trên đường phố không có người qua lại.", "Được người dân ủng hộ.", "Được cơ quan có thẩm quyền cấp phép."], correctAnswer: 2, hint: "Mọi hoạt động đua xe đều phải được cơ quan có thẩm quyền cấp phép mới hợp pháp." },
+                { id: 4, chapter: 4, isFatal: false, question: "Khái niệm 'Đỗ xe' được hiểu như thế nào là đúng quy tắc giao thông?", options: ["Là trạng thái đứng yên của phương tiện có giới hạn trong một khoảng thời gian.", "Là trạng thái đứng yên của phương tiện giao thông không giới hạn thời gian."], correctAnswer: 1, hint: "Đỗ xe là trạng thái đứng yên KHÔNG giới hạn thời gian. Dừng xe mới có giới hạn thời gian." },
+                { id: 5, chapter: 5, isFatal: false, question: "Biển nào cấm các loại xe cơ giới đi vào, trừ xe gắn máy, xe mô tô 2 bánh và các loại xe ưu tiên theo luật định?", options: ["Biển báo cấm ô tô.", "Biển báo cấm xe tải.", "Biển cấm rẽ trái."], correctAnswer: 0, hint: "Biển cấm ô tô sẽ cấm tất cả các loại xe cơ giới từ 3 bánh trở lên." }
+            ];
+            // Tạo Blob mô phỏng file questions.json
+            const blob = new Blob([JSON.stringify(mockData)], { type: 'application/json' });
+            return URL.createObjectURL(blob);
+        };
+
+        const loadQuestionsFromJson = async () => {
+            try {
+                // Trong thực tế, bạn đổi url này thành './questions.json'
+                const jsonUrl = generateMockJsonData(); 
+                const response = await fetch(jsonUrl);
+                questionBank = await response.json();
+                console.log(`Đã load ${questionBank.length} câu hỏi từ JSON.`);
+            } catch (error) {
+                console.error("Lỗi tải JSON:", error);
+                showModal("Lỗi", "Không thể tải dữ liệu câu hỏi.");
+            }
+        };
+
+        // ==========================================
+        // 3. STATE & DOM
+        // ==========================================
+        const state = {
+            user: null,
+            userData: { wrongIds: [], bookmarkIds: [] },
+            mode: '', // exam, random, chapter, wrong, bookmark
+            activeQuestions: [],
+            currentIndex: 0,
+            userAnswers: {}, 
+            timerId: null,
+            timeLeft: 0
+        };
+
+        const els = {
+            views: { landing: document.getElementById('view-landing'), dashboard: document.getElementById('view-dashboard'), quiz: document.getElementById('view-quiz') },
+            auth: { btn: document.getElementById('login-btn'), profile: document.getElementById('user-profile'), name: document.getElementById('user-name'), avatar: document.getElementById('user-avatar'), logout: document.getElementById('logout-btn') },
+            badges: { wrong: document.getElementById('badge-wrong'), bookmark: document.getElementById('badge-bookmark') },
+            quiz: { 
+                modeLabel: document.getElementById('quiz-mode-label'), qText: document.getElementById('quiz-question'), 
+                options: document.getElementById('quiz-options'), progText: document.getElementById('quiz-progress-text'), 
+                progBar: document.getElementById('quiz-progress-bar'), critical: document.getElementById('quiz-critical-badge'), 
+                timerCont: document.getElementById('quiz-timer-container'), timer: document.getElementById('quiz-timer'), 
+                hint: document.getElementById('quiz-hint'), hintText: document.getElementById('quiz-hint-text'), 
+                btnPrev: document.getElementById('btn-prev'), btnNext: document.getElementById('btn-next'), 
+                btnSubmit: document.getElementById('btn-submit'), btnBook: document.getElementById('btn-bookmark'), 
+                iconBook: document.getElementById('icon-bookmark') 
+            },
+            modal: document.getElementById('modal-overlay')
+        };
+
+        // ==========================================
+        // 4. AUTH & CLOUD FIRESTORE
+        // ==========================================
+        const initAuth = async () => {
+            if (isMockMode) return;
+            
+            if (initialAuthToken) {
+                try { await signInWithCustomToken(auth, initialAuthToken); }
+                catch (e) { console.warn("Custom token fail:", e); }
+            }
+            
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    state.user = user;
+                    els.auth.btn.classList.add('hide');
+                    els.auth.profile.classList.remove('hide');
+                    els.auth.name.textContent = user.displayName || 'Học viên';
+                    els.auth.avatar.src = user.photoURL || 'https://placehold.co/100';
+                    
+                    await loadUserData();
+                    if(state.mode === '') switchView('dashboard');
+                } else {
+                    state.user = null;
+                    els.auth.profile.classList.add('hide');
+                    els.auth.btn.classList.remove('hide');
+                    switchView('landing');
+                }
+            });
+        };
+
+        els.auth.btn.addEventListener('click', async () => {
+            if (isMockMode) return;
+            const provider = new GoogleAuthProvider();
+            try { await signInWithPopup(auth, provider); } 
+            catch (e) { 
+                try { await signInAnonymously(auth); } catch(err) { showModal('Lỗi', err.message); }
+            }
+        });
+        els.auth.logout.addEventListener('click', () => { if(!isMockMode) signOut(auth); });
+
+        const loadUserData = async () => {
+            if (isMockMode || !state.user) return;
+            try {
+                // Rule 1: Strict Paths
+                const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'appData', 'progress');
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    state.userData = { wrongIds: [], bookmarkIds: [], ...snap.data() };
+                } else {
+                    await setDoc(docRef, state.userData);
+                }
+                updateBadges();
+            } catch (error) { console.error("Lỗi tải data:", error); }
+        };
+
+        const saveUserData = async () => {
+            if (isMockMode || !state.user) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'appData', 'progress');
+                await setDoc(docRef, state.userData, { merge: true });
+                updateBadges();
+            } catch (error) { console.error("Lỗi lưu data:", error); }
+        };
+
+        const updateBadges = () => {
+            els.badges.wrong.textContent = state.userData.wrongIds.length;
+            els.badges.bookmark.textContent = state.userData.bookmarkIds.length;
+        };
+
+        // ==========================================
+        // 5. APP NAVIGATION & QUIZ ENGINE
+        // ==========================================
+        const switchView = (v) => {
+            Object.values(els.views).forEach(el => el.classList.add('hide'));
+            els.views[v].classList.remove('hide');
+        };
+
+        window.goHome = () => {
+            if (state.timerId) clearInterval(state.timerId);
+            state.mode = '';
+            switchView(state.user ? 'dashboard' : 'landing');
+        };
+
+        window.startMode = (modeStr) => {
+            state.mode = modeStr;
+            state.currentIndex = 0;
+            state.userAnswers = {};
+            els.quiz.hint.classList.add('hide');
+
+            let title = "";
+            let pool = [...questionBank];
+
+            switch(modeStr) {
+                case 'exam': 
+                    title = "(Thi thử)"; 
+                    // Random 30 câu (Hoặc tối đa số câu hiện có)
+                    state.activeQuestions = pool.sort(() => 0.5 - Math.random()).slice(0, 30);
+                    state.timeLeft = 20 * 60; 
+                    startTimer();
+                    break;
+                case 'random':
+                    title = "(Học ngẫu nhiên)";
+                    state.activeQuestions = pool.sort(() => 0.5 - Math.random());
+                    break;
+                case 'chapter':
+                    title = "(Theo chương)";
+                    state.activeQuestions = pool;
+                    break;
+                case 'wrong':
+                    title = "(Câu sai)";
+                    state.activeQuestions = pool.filter(q => state.userData.wrongIds.includes(q.id));
+                    if(state.activeQuestions.length === 0) return showModal('Tuyệt vời', 'Bạn không có câu sai nào!');
+                    break;
+                case 'bookmark':
+                    title = "(Đã đánh dấu)";
+                    state.activeQuestions = pool.filter(q => state.userData.bookmarkIds.includes(q.id));
+                    if(state.activeQuestions.length === 0) return showModal('Thông báo', 'Bạn chưa lưu ý câu nào.');
+                    break;
+            }
+
+            els.quiz.modeLabel.textContent = title;
+            renderQuestion();
+            switchView('quiz');
+        };
+
+        const renderQuestion = () => {
+            const q = state.activeQuestions[state.currentIndex];
+            const isExam = state.mode === 'exam';
+            const total = state.activeQuestions.length;
+
+            // Header UI
+            els.quiz.progText.textContent = `${state.currentIndex + 1}/${total}`;
+            els.quiz.progBar.style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+            els.quiz.qText.innerHTML = `<strong>Câu ${state.currentIndex + 1}:</strong> ${q.question}`;
+            
+            q.isFatal ? els.quiz.critical.classList.remove('hide') : els.quiz.critical.classList.add('hide');
+            
+            // Layout adjustments
+            if (isExam) {
+                els.quiz.timerCont.classList.remove('hide');
+                els.quiz.timerCont.classList.add('flex');
+                if (state.currentIndex === total - 1) {
+                    els.quiz.btnNext.classList.add('hide');
+                    els.quiz.btnSubmit.classList.remove('hide');
+                    els.quiz.btnSubmit.classList.add('flex');
+                } else {
+                    els.quiz.btnNext.classList.remove('hide');
+                    els.quiz.btnSubmit.classList.add('hide');
+                }
+            } else {
+                els.quiz.timerCont.classList.add('hide');
+                els.quiz.timerCont.classList.remove('flex');
+                els.quiz.btnNext.classList.remove('hide');
+                els.quiz.btnSubmit.classList.add('hide');
+            }
+
+            els.quiz.btnPrev.disabled = state.currentIndex === 0;
+            els.quiz.btnNext.disabled = (!isExam && state.currentIndex === total - 1);
+            
+            updateBookmarkBtn();
+
+            // Options
+            els.quiz.options.innerHTML = '';
+            els.quiz.hint.classList.add('hide');
+            
+            const selectedOpt = state.userAnswers[state.currentIndex];
+            const hasAnswered = selectedOpt !== undefined;
+
+            q.options.forEach((text, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-option w-full text-left p-4 sm:p-5 rounded-2xl border-2 border-slate-200 bg-white font-medium text-slate-700 flex items-start gap-3 mb-3`;
+                
+                let iconUI = `<div class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 shrink-0 text-sm mt-0.5">${idx + 1}</div>`;
+                let tailUI = "";
+
+                if (isExam) {
+                    if (hasAnswered && selectedOpt === idx) {
+                        btn.classList.add('selected');
+                        iconUI = iconUI.replace('bg-slate-100 text-slate-500', 'bg-blue-500 text-white');
+                    }
+                    btn.onclick = () => { 
+                        state.userAnswers[state.currentIndex] = idx; 
+                        renderQuestion(); 
+                    };
+                } else {
+                    if (hasAnswered) {
+                        btn.disabled = true;
+                        if (idx === q.correctAnswer) {
+                            btn.classList.add('correct');
+                            iconUI = iconUI.replace('bg-slate-100 text-slate-500', 'bg-green-500 text-white');
+                            tailUI = `<i class="fa-solid fa-check text-green-500 text-xl ml-auto mt-1"></i>`;
+                        } else if (idx === selectedOpt) {
+                            btn.classList.add('wrong');
+                            iconUI = iconUI.replace('bg-slate-100 text-slate-500', 'bg-red-500 text-white');
+                            tailUI = `<i class="fa-solid fa-xmark text-red-500 text-xl ml-auto mt-1"></i>`;
+                        }
+                    } else {
+                        btn.onclick = () => handlePracticeAnswer(idx, q);
+                    }
+                }
+
+                btn.innerHTML = `${iconUI} <div class="flex-1">${text}</div> ${tailUI}`;
+                els.quiz.options.appendChild(btn);
+            });
+
+            // Gợi ý cho chế độ học
+            if (!isExam && hasAnswered) {
+                els.quiz.hintText.textContent = q.hint || "Không có giải thích cho câu này.";
+                els.quiz.hint.classList.remove('hide');
+            }
+        };
+
+        const handlePracticeAnswer = (idx, q) => {
+            state.userAnswers[state.currentIndex] = idx;
+            
+            // Xử lý lưu câu sai vào Firestore
+            if (idx !== q.correctAnswer) {
+                if (!state.userData.wrongIds.includes(q.id)) {
+                    state.userData.wrongIds.push(q.id);
+                    saveUserData();
+                }
+            } else {
+                const arrIdx = state.userData.wrongIds.indexOf(q.id);
+                if (arrIdx > -1) {
+                    state.userData.wrongIds.splice(arrIdx, 1);
+                    saveUserData();
+                }
+            }
+            renderQuestion();
+        };
+
+        window.navQuestion = (dir) => {
+            const next = state.currentIndex + dir;
+            if (next >= 0 && next < state.activeQuestions.length) {
+                state.currentIndex = next;
+                renderQuestion();
+            }
+        };
+
+        window.toggleBookmark = () => {
+            const qId = state.activeQuestions[state.currentIndex].id;
+            const idx = state.userData.bookmarkIds.indexOf(qId);
+            if (idx > -1) state.userData.bookmarkIds.splice(idx, 1);
+            else state.userData.bookmarkIds.push(qId);
+            
+            saveUserData();
+            updateBookmarkBtn();
+        };
+
+        const updateBookmarkBtn = () => {
+            const qId = state.activeQuestions[state.currentIndex].id;
+            if (state.userData.bookmarkIds.includes(qId)) {
+                els.quiz.iconBook.className = "fa-solid fa-star text-yellow-500";
+            } else {
+                els.quiz.iconBook.className = "fa-regular fa-star text-slate-400";
+            }
+        };
+
+        // ==========================================
+        // 6. EXAM LOGIC
+        // ==========================================
+        const startTimer = () => {
+            if(state.timerId) clearInterval(state.timerId);
+            const format = t => t.toString().padStart(2, '0');
+            
+            const updateUI = () => {
+                const m = Math.floor(state.timeLeft / 60);
+                const s = state.timeLeft % 60;
+                els.quiz.timer.textContent = `${format(m)}:${format(s)}`;
+            };
+            
+            updateUI();
+            state.timerId = setInterval(() => {
+                state.timeLeft--;
+                updateUI();
+                if (state.timeLeft <= 0) {
+                    clearInterval(state.timerId);
+                    submitExam();
+                }
+            }, 1000);
+        };
+
+        window.submitExam = () => {
+            if(state.timerId) clearInterval(state.timerId);
+
+            let correct = 0, wrong = 0, fatalWrong = 0;
+            
+            state.activeQuestions.forEach((q, idx) => {
+                const ans = state.userAnswers[idx];
+                if (ans === undefined) { wrong++; } 
+                else if (ans === q.correctAnswer) { correct++; }
+                else { 
+                    wrong++; 
+                    if(q.isFatal) fatalWrong++; 
+                    // Auto add to wrongIds array
+                    if (!state.userData.wrongIds.includes(q.id)) state.userData.wrongIds.push(q.id);
+                }
+            });
+            saveUserData();
+
+            const isPass = wrong <= 3 && fatalWrong === 0;
+
+            els.modal.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+                    <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 ${isPass ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                        <i class="fa-solid ${isPass ? 'fa-check' : 'fa-xmark'}"></i>
+                    </div>
+                    <h2 class="text-3xl font-extrabold mb-2 ${isPass ? 'text-green-600' : 'text-red-600'}">${isPass ? 'ĐẠT' : 'KHÔNG ĐẠT'}</h2>
+                    
+                    <p class="text-slate-600 font-medium mb-6">Đúng <strong class="text-slate-900">${correct}/${state.activeQuestions.length}</strong> câu</p>
+                    
+                    <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-3 mb-6 border border-slate-100">
+                        <div class="flex justify-between text-sm"><span class="text-slate-500">Số câu đúng:</span> <span class="font-bold text-green-600">${correct}</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-500">Số câu sai/bỏ qua:</span> <span class="font-bold text-red-600">${wrong}</span></div>
+                        <div class="flex justify-between text-sm pt-2 border-t border-slate-200"><span class="text-slate-500">Sai câu điểm liệt:</span> <span class="font-bold ${fatalWrong > 0 ? 'text-red-600' : 'text-slate-800'}">${fatalWrong}</span></div>
+                    </div>
+                    
+                    <button onclick="closeModal(); goHome();" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold transition">Về Trang Chủ</button>
+                </div>
+            `;
+            els.modal.classList.remove('hide');
+        };
+
+        window.showModal = (title, msg) => {
+            els.modal.innerHTML = `
+                <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-xl text-center">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">${title}</h3>
+                    <p class="text-slate-600 mb-6 text-sm">${msg}</p>
+                    <button onclick="closeModal()" class="w-full bg-blue-600 text-white py-2.5 rounded-xl font-bold">Đóng</button>
+                </div>
+            `;
+            els.modal.classList.remove('hide');
+        };
+        window.closeModal = () => els.modal.classList.add('hide');
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadQuestionsFromJson();
+            initAuth();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "chapter": 1,
+    "isFatal": false,
+    "question": "Phần của đường bộ được sử dụng cho các phương tiện giao thông qua lại là gì?",
+    "image": "",
+    "options": [
+      "1. Phần mặt đường và lề đường.",
+      "2. Phần đường xe chạy.",
+      "3. Phần đường xe cơ giới."
+    ],
+    "correctAnswer": 1,
+    "hint": "Phần đường xe chạy là phần của đường bộ được sử dụng cho phương tiện giao thông qua lại."
+  },
+  {
+    "id": 2,
+    "chapter": 1,
+    "isFatal": true,
+    "question": "Hành vi nào dưới đây bị nghiêm cấm theo Luật Giao thông đường bộ?",
+    "image": "",
+    "options": [
+      "1. Đỗ xe trên đường phố.",
+      "2. Sử dụng xe đạp đi trên các tuyến quốc lộ có tốc độ cao.",
+      "3. Lắp đặt, sử dụng còi, đèn không đúng thiết kế của nhà sản xuất đối với từng loại xe cơ giới.",
+      "4. Sử dụng còi trong đô thị từ 22 giờ đến 5 giờ sáng."
+    ],
+    "correctAnswer": 2,
+    "hint": "Việc thay đổi thiết kế còi, đèn làm ảnh hưởng nghiêm trọng đến an toàn kỹ thuật (Đây là câu điểm liệt, sai sẽ trượt)."
+  },
+  {
+    "id": 486,
+    "chapter": 5,
+    "isFatal": false,
+    "question": "Biển nào báo hiệu 'Giao nhau với đường ưu tiên'?",
+    "image": "./images/bien-bao-486.jpg",
+    "options": [
+      "1. Biển 1.",
+      "2. Biển 2.",
+      "3. Biển 3."
+    ],
+    "correctAnswer": 1,
+    "hint": "Biển tam giác ngược (Biển 2) mang ý nghĩa giao nhau với đường ưu tiên, bạn phải nhường đường."
+  }
+]
