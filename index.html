@@ -156,20 +156,22 @@
 
     <!-- FIREBASE & LOGIC SCRIPT -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
         // ==========================================
         // 1. DÁN FIREBASE CONFIG CỦA BẠN VÀO ĐÂY
         // ==========================================
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
-            apiKey: "AIzaSy_YOUR_API_KEY_HERE",
-            authDomain: "your-project.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcde12345"
+          apiKey: "AIzaSyDwYXnjHJpV4Q0NfEJAqhYIUvN-aqwyxB4",
+          authDomain: "gplx2026-665a0.firebaseapp.com",
+          projectId: "gplx2026-665a0",
+          storageBucket: "gplx2026-665a0.firebasestorage.app",
+          messagingSenderId: "67944833469",
+          appId: "1:67944833469:web:373478f0c1dcc0e3aa72d4",
+          measurementId: "G-2NRQFD1MX8"
         };
 
         const app = initializeApp(firebaseConfig);
